@@ -13,7 +13,7 @@ const uploadController = {
         if (err) {
           console.log(err);
         }
-        console.log('req.file.path', req.file.path);
+
         return new Promise((resolve) => {
           cloudinary.uploader.upload(
             req.file.path,
