@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+
+  # Define the MongoDB service
+  mongo:
+    restart: always
+    image: mongo
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+
+  # Define the Node.js app service
+  app:
+    restart: always
+    build: .
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_DB_URI=mongodb://mongo:27017/hotel
+
+volumes:
+  mongodb-data:
