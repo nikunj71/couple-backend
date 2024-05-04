@@ -26,8 +26,11 @@ const authController = {
     const { userName,displayName, email, password, profilePhoto, mobile, partnerIds } =
       req.body;
 
-    let existingUser = await User.findOne({ email });
-    let userNameData = await User.findOne({ userName });
+    let existingUser = await User.findOne({ email: email, is_deleted: false });
+    let userNameData = await User.findOne({
+      userName: userName,
+      is_deleted: false,
+    });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists.' });
     }
@@ -66,9 +69,9 @@ const authController = {
     const { email, username, password } = req.body;
 
     // let user = '';
-    let user = await User.findOne({ userName: email });
+    let user = await User.findOne({ userName: email, is_deleted: false });
     if(!user){
-     user = await User.findOne({ email: email });
+     user = await User.findOne({ email: email, is_deleted: false });
     }
 
     // if (username){

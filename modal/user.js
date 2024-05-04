@@ -38,7 +38,12 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    is_deleted: {
+      type: Boolean,
+      default: false,
+    },
     partnerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    invitations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );

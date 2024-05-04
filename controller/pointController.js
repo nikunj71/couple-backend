@@ -49,8 +49,7 @@ const pointController = {
           message: `You can't give points to yourself—spread the kindness to others!`,
         });
       }
-      const userData = await User.findOne({ _id: userId });
-      console.log('userData', userData);
+      const userData = await User.findOne({ _id: userId, is_deleted: false });
 
       if (!userData) {
         return res.status(404).send('Receiver User not found');
@@ -59,7 +58,7 @@ const pointController = {
       // Calculate points, assuming positive ratings add points and negative subtract
       const pointsChange = rating; // Customize this logic based on your rating scale
       userData.points += pointsChange;
-      console.log('userData', userData._id);
+
       await User.updateOne(
         { _id: userData._id },
         { $set: { points: userData?.points } }
