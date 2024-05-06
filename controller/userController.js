@@ -117,37 +117,37 @@ const userController = {
     }
   }),
   manageInvitation: catchAsync(async (req, res) => {
-    try {
-      const { email, is_accepted } = req.body;
-      const { user } = req.user;
-      if (is_accepted) {
-        const invitationUser = await User.findOne({ email: email });
-        console.log('invitationUser?._id', invitationUser?._id);
-        await User.updateOne(
-          { _id: user?.id },
-          {
-            $pull: { invitations: invitationUser?._id },
-            $push: { partnerIds: invitationUser?._id },
-          }
-        );
-        await User.updateOne(
-          { _id: invitationUser?._id },
-          {
-            $push: { partnerIds: user?.id },
-          }
-        );
-      } else {
-        await User.updateOne(
-          { _id: user?.id },
-          { $pull: { invitations: invitationUser?._id } }
-        );
-      }
-      res.status(200).json({
-        status: 'success',
-      });
-    } catch (error) {
-      res.status(500).send('Internal Server error');
+    // try {
+    const { email, is_accepted } = req.body;
+    const { user } = req.user;
+    const invitationUser = await User.findOne({ email: email });
+
+    if (is_accepted) {
+      await User.updateOne(
+        { _id: user?.id },
+        {
+          $pull: { invitations: invitationUser?._id },
+          $push: { partnerIds: invitationUser?._id },
+        }
+      );
+      await User.updateOne(
+        { _id: invitationUser?._id },
+        {
+          $push: { partnerIds: user?.id },
+        }
+      );
+    } else {
+      await User.updateOne(
+        { _id: user?.id },
+        { $pull: { invitations: invitationUser?._id } }
+      );
     }
+    res.status(200).json({
+      status: 'success',
+    });
+    // } catch (error) {
+    //   res.status(500).send('Internal Server error');
+    // }
   }),
 };
 

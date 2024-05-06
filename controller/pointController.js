@@ -88,43 +88,43 @@ const pointController = {
     }
   }),
   list: catchAsync(async (req, res) => {
-     const { startDate, endDate } = req.body;
+    const { startValue, endValue } = req.body;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    try {
-      const RatingList = await Rating.find({
-        $and: [
-          {
-            createdAt: {
-              $gte: new Date(startDate),
-              $lte: new Date(endDate),
-            },
+    // try {
+    const RatingList = await Rating.find({
+      $and: [
+        {
+          createdAt: {
+            $gte: new Date(startValue),
+            $lte: new Date(endValue),
           },
-          {
-            $or: [
-              { sendUserId: req.user.user.id },
-              { receivedUserId: req.user.user.id },
-            ],
-          },
-        ],
-      })
-        // .skip(skip)
-        // .limit(limit)
-        .populate({ path: 'receivedUserId' })
-        .populate({ path: 'sendUserId' });
-    
-      res.send({
-        page,
-        limit,
-        totalPages: Math.ceil(RatingList.length / limit),
-        total: RatingList.length,
-        data: RatingList,
-      });
-    } catch (error) {
-      console.error('Error getting users:', error);
-      res.status(500).send('Internal Server Error');
-    }
+        },
+        {
+          $or: [
+            { sendUserId: req.user.user.id },
+            { receivedUserId: req.user.user.id },
+          ],
+        },
+      ],
+    })
+      // .skip(skip)
+      // .limit(limit)
+      .populate({ path: 'receivedUserId' })
+      .populate({ path: 'sendUserId' });
+
+    res.send({
+      page,
+      limit,
+      totalPages: Math.ceil(RatingList.length / limit),
+      total: RatingList.length,
+      data: RatingList,
+    });
+    // } catch (error) {
+    //   console.error('Error getting users:', error);
+    //   res.status(500).send('Internal Server Error');
+    // }
   }),
 };
 
