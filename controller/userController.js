@@ -54,9 +54,13 @@ const userController = {
       const user = await User.findOne({
         _id: userId,
         is_deleted: false,
-      }).populate({
-        path: 'partnerIds',
-      });
+      })
+        .populate({
+          path: 'partnerIds',
+        })
+        .populate({
+          path: 'invitations',
+        });
 
       if (!user) {
         return res.status(404).json({ message: 'User not found.' });
@@ -96,8 +100,7 @@ const userController = {
       res.status(500).send('Internal Server error');
     }
   }),
-
-  invitation: catchAsync(async (req, res) => {
+  sendInvitation: catchAsync(async (req, res) => {
     try {
       const { email } = req.body;
       const { user } = req.user;
@@ -108,6 +111,39 @@ const userController = {
       res.status(200).json({
         status: 'success',
         message: 'Invitation sent successfully.',
+      });
+    } catch (error) {
+      res.status(500).send('Internal Server error');
+    }
+  }),
+  manageInvitation: catchAsync(async (req, res) => {
+    try {
+      const { email, is_accepted } = req.body;
+      const { user } = req.user;
+      if (is_accepted) {
+        const invitationUser = await User.findOne({ email: email });
+        console.log('invitationUser?._id', invitationUser?._id);
+        await User.updateOne(
+          { _id: user?.id },
+          {
+            $pull: { invitations: invitationUser?._id },
+            $push: { partnerIds: invitationUser?._id },
+          }
+        );
+        await User.updateOne(
+          { _id: invitationUser?._id },
+          {
+            $push: { partnerIds: user?.id },
+          }
+        );
+      } else {
+        await User.updateOne(
+          { _id: user?.id },
+          { $pull: { invitations: invitationUser?._id } }
+        );
+      }
+      res.status(200).json({
+        status: 'success',
       });
     } catch (error) {
       res.status(500).send('Internal Server error');
