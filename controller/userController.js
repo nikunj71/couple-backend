@@ -3,7 +3,7 @@ import catchAsync from '../utils/catchAsync.js';
 
 const userController = {
   update: catchAsync(async (req, res) => {
-    const { userName, email, profilePhoto, mobile } = req.body;
+    const { userName, email } = req.body;
 
     try {
       let existingUser = await User.findOne({
@@ -21,15 +21,19 @@ const userController = {
       if (username && username?._id.toString() !== req.params.id) {
         return res.status(404).json({ message: 'User name already exists.' });
       }
+
       const updatedUser = await User.updateOne(
         { _id: req.params.id },
         {
-          $set: {
-            userName,
-            email,
-            profilePhoto,
-            mobile,
-          },
+          $set: req.body.is_deleted
+            ? { is_deleted: true, partnerIds: [] }
+            : req.body,
+        }
+      );
+      await User.updateOne(
+        { partnerIds: { $in: [req.params.id] } },
+        {
+          $pull: { partnerIds: req.params.id },
         }
       );
 
@@ -57,7 +61,6 @@ const userController = {
       if (!user) {
         return res.status(404).json({ message: 'User not found.' });
       }
-
       res.send(user);
     } catch (error) {
       console.error('Error getting user:', error);

@@ -74,12 +74,6 @@ const authController = {
      user = await User.findOne({ email: email, is_deleted: false });
     }
 
-    // if (username){
-    //   user = await User.findOne({ userName: email });
-    // } else{
-    //   user = await User.findOne({ email });
-    // }
-
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
